@@ -203,6 +203,8 @@ anychart.onDocumentReady(function () {
     var updatedJson = savedJson
         ? JSON.parse(savedJson)
         : { dosing_schedule: JSON.parse(document.getElementById("dosing-json").value), thresholds: { from: 14, to: 16 } };
+    document.getElementById("threshold-from").value = updatedJson.thresholds.from;
+    document.getElementById("threshold-to").value = updatedJson.thresholds.to;
     updateTableFromJson(updatedJson.dosing_schedule);
     createChart(updatedJson.dosing_schedule);
 
