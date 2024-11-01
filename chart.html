@@ -55,6 +55,11 @@
       justify-content: center;
       margin-top: 10px;
     }
+    #thresholds-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
     #add-row-button, #remove-row-button {
       margin: 0 10px;
       padding: 5px 10px;
@@ -78,20 +83,23 @@
       <!-- Rows will be generated here -->
     </tbody>
   </table>
+
+  <div id="buttons-container">
+    <button id="add-row-button">Add Row</button>
+    <button id="remove-row-button">Remove Last Row</button>
+  </div>
+  
   <div id="thresholds-container">
     <label for="threshold-from">Threshold From:</label>
     <input type="number" id="threshold-from" name="threshold-from" min="0" value="14">
     <label for="threshold-to">Threshold To:</label>
     <input type="number" id="threshold-to" name="threshold-to" min="0" value="16">
   </div>
-  <div id="buttons-container">
-    <button id="add-row-button">Add Row</button>
-    <button id="remove-row-button">Remove Last Row</button>
-  </div>
 
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-annotations.min.js"></script>
   <script src="code.js"></script>
   </body>
 </html>

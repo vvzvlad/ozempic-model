@@ -136,6 +136,13 @@ anychart.onDocumentReady(function () {
 
         // turn the legend on
         chart.legend().enabled(true).fontSize(13).padding([0, 0, 20, 0]);
+        
+        var controller = chart.annotations();
+        // Create vertical line annotation.
+        controller.verticalLine({
+            xAnchor: new Date().toISOString().split("T")[0],
+            stroke: '2 #F44336'
+        }).allowEdit(false);
 
         // add a scroller to the x-axis
         chart.xScroller(true);
@@ -144,12 +151,7 @@ anychart.onDocumentReady(function () {
         chart.container("container");
         chart.draw();
 
-        var controller = chart.annotations();
-        // Create vertical line annotation.
-        controller.verticalLine({
-            xAnchor: new Date().toISOString().split("T")[0],
-            stroke: '2 #F44336'
-        });
+
     }
 
     function updateTableFromJson(dosingData) {
