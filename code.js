@@ -143,6 +143,13 @@ anychart.onDocumentReady(function () {
         // set container for the chart and define padding
         chart.container("container");
         chart.draw();
+
+        var controller = chart.annotations();
+        // Create vertical line annotation.
+        controller.verticalLine({
+            xAnchor: new Date().toISOString().split("T")[0],
+            stroke: '2 #F44336'
+        });
     }
 
     function updateTableFromJson(dosingData) {
