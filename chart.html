@@ -67,10 +67,7 @@
   </style>
   </head>
   <body>
-  <div id="dosing-json-container">
-    <textarea id="dosing-json">{"dosing_schedule":[["2024-08-30","0.25"],["2024-09-01","0.25"],["2024-09-08","0.25"],["2024-09-15","0.25"],["2024-09-22","0.25"],["2024-09-25","0.25"],["2024-09-29","0.25"],["2024-10-05","0.5"],["2024-10-13","0.5"],["2024-10-20","0.25"],["2024-10-24","0.25"],["2024-10-26","0.25"],["2024-10-30","0.25"],["2024-11-02","0.25"],["2024-11-05","0.25"],["2024-11-09","0.25"],["2024-11-13","0.25"],["2024-11-16","0.25"],["2024-11-17","0.25"]]}</textarea>
-    <button id="load-json-button">Load from JSON</button>
-  </div>
+
   <div id="container"></div>
   <table id="dosing-schedule-table">
     <thead>
@@ -96,6 +93,11 @@
     <input type="number" id="threshold-to" name="threshold-to" min="0" value="16">
   </div>
 
+  <div id="dosing-json-container">
+    <textarea id="dosing-json">{"dosing_schedule":[["2024-08-30","0.25"],["2024-09-01","0.25"],["2024-09-08","0.25"],["2024-09-15","0.25"],["2024-09-22","0.25"],["2024-09-25","0.25"],["2024-09-29","0.25"],["2024-10-05","0.5"],["2024-10-13","0.5"],["2024-10-20","0.25"],["2024-10-24","0.25"],["2024-10-26","0.25"],["2024-10-30","0.25"],["2024-11-02","0.25"],["2024-11-05","0.25"],["2024-11-09","0.25"],["2024-11-13","0.25"],["2024-11-16","0.25"],["2024-11-17","0.25"]]}</textarea>
+    <button id="load-json-button">Load from JSON</button>
+  </div>
+  
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>

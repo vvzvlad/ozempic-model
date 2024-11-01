@@ -138,8 +138,15 @@ anychart.onDocumentReady(function () {
         chart.yScale().ticks().interval(3);
         chart.yScale().minorTicks().interval(1);
 
-        var ticksArray = all_dates.map(date => date.getTime());
-        chart.xScale().ticks().set(ticksArray);
+        //var ticksArray = all_dates.map(date => date.getTime());
+        //ticksArray = [1,2,3,20, 30]
+        //chart.xScale().ticks().set(ticksArray)
+
+        chart.left(20);
+        chart.right(20);
+        var dateTimeScale = anychart.scales.dateTime();
+        dateTimeScale.ticks().interval('day',1);
+        chart.xScale(dateTimeScale);
 
         chart.xGrid({stroke: '#E8E8E8', dash: "3 5"}).xMinorGrid(false)
         chart.yGrid({stroke: '#E8E8E8', dash: "3 5"}).yMinorGrid(false)
