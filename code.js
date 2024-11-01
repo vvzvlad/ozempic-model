@@ -190,7 +190,9 @@ anychart.onDocumentReady(function () {
             var dose = row.querySelector(`input[name='dose-${index}']:checked`).value;
             dosingData.push([date, dose]);
         });
-        var updatedJson = { dosing_schedule: dosingData };
+        var thresholdFrom = parseFloat(document.getElementById("threshold-from").value);
+        var thresholdTo = parseFloat(document.getElementById("threshold-to").value);
+        var updatedJson = { dosing_schedule: dosingData, thresholds: { from: thresholdFrom, to: thresholdTo } };
         document.getElementById("dosing-json").value = JSON.stringify(updatedJson);
         localStorage.setItem("dosingData", JSON.stringify(updatedJson));
         createChart(dosingData);
