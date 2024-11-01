@@ -275,4 +275,17 @@ anychart.onDocumentReady(function () {
         .addEventListener("input", function () {
             updateJsonFromTable();
         });
+
+    // Update JSON and chart whenever threshold inputs change
+    document
+        .getElementById("threshold-from")
+        .addEventListener("input", function () {
+            updateJsonFromTable();
+        });
+
+    document
+        .getElementById("threshold-to")
+        .addEventListener("input", function () {
+            updateJsonFromTable();
+        });
 });
