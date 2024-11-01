@@ -129,7 +129,10 @@ anychart.onDocumentReady(function () {
         seriesMovingAverage.stroke({ dash: "5 2", thickness: 2, color: "#FF5733", });
         seriesMovingAverage.tooltip().enabled(false);
 
-        chart.rangeMarker().from(14).to(16).fill("rgba(0, 255, 0, 0.3)");
+        var thresholdFrom = parseFloat(document.getElementById("threshold-from").value);
+        var thresholdTo = parseFloat(document.getElementById("threshold-to").value);
+        chart.rangeMarker().from(thresholdFrom).to(thresholdTo).fill("rgba(0, 255, 0, 0.3)");
+        updatedJson.thresholds = { from: thresholdFrom, to: thresholdTo };
 
         // turn the legend on
         chart.legend().enabled(true).fontSize(13).padding([0, 0, 20, 0]);
@@ -197,7 +200,7 @@ anychart.onDocumentReady(function () {
     var savedJson = localStorage.getItem("dosingData");
     var defaultJson = savedJson
         ? JSON.parse(savedJson)
-        : JSON.parse(document.getElementById("dosing-json").value);
+        : { dosing_schedule: JSON.parse(document.getElementById("dosing-json").value), thresholds: { from: 14, to: 16 } };
     updateTableFromJson(defaultJson.dosing_schedule);
     createChart(defaultJson.dosing_schedule);
 
