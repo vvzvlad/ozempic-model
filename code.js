@@ -129,6 +129,8 @@ anychart.onDocumentReady(function () {
         seriesMovingAverage.stroke({ dash: "5 2", thickness: 2, color: "#FF5733", });
         seriesMovingAverage.tooltip().enabled(false);
 
+        chart.rangeMarker().from(14).to(16).fill("rgba(0, 255, 0, 0.3)");
+
         // turn the legend on
         chart.legend().enabled(true).fontSize(13).padding([0, 0, 20, 0]);
 
