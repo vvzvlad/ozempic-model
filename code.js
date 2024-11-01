@@ -138,7 +138,7 @@ anychart.onDocumentReady(function () {
         chart.yScale().ticks().interval(3);
         chart.yScale().minorTicks().interval(1);
 
-        var ticksArray = [];
+        var ticksArray = all_dates.map(date => date.toISOString().split("T")[0]);
         chart.xScale().ticks().set(ticksArray);
 
         chart.xGrid({stroke: '#E8E8E8', dash: "3 5"}).xMinorGrid(false)
