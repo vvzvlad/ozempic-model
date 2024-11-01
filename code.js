@@ -141,7 +141,7 @@ anychart.onDocumentReady(function () {
         // Create vertical line annotation.
         controller.verticalLine({
             xAnchor: new Date().toISOString().split("T")[0],
-            stroke: '2 #F44336'
+            stroke: '2 #000000 dashed'
         }).allowEdit(false);
 
         // add a scroller to the x-axis
