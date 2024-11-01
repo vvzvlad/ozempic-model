@@ -135,7 +135,14 @@ anychart.onDocumentReady(function () {
         updatedJson.thresholds = { from: thresholdFrom, to: thresholdTo };
 
         chart.legend().enabled(true).fontSize(13).padding([0, 0, 20, 0]);
-        chart.yGrid({stroke: '#E8E8E8'}).xGrid({stroke: '#E8E8E8'}).xMinorGrid(false).yMinorGrid(true);
+        chart.yScale().ticks().interval(3);
+        chart.yScale().minorTicks().interval(1);
+
+        var ticksArray = [];
+        chart.xScale().ticks().set(ticksArray);
+
+        chart.xGrid({stroke: '#E8E8E8', dash: "3 5"}).xMinorGrid(false)
+        chart.yGrid({stroke: '#E8E8E8', dash: "3 5"}).yMinorGrid(false)
 
         var controller = chart.annotations();
         controller.verticalLine({ xAnchor: new Date().toISOString().split("T")[0], }).allowEdit(false).stroke({color: '#009688', thickness: 2, dash: '5 5', lineCap: 'round'});
