@@ -134,15 +134,11 @@ anychart.onDocumentReady(function () {
         chart.rangeMarker().from(thresholdFrom).to(thresholdTo).fill("rgba(0, 255, 0, 0.3)");
         updatedJson.thresholds = { from: thresholdFrom, to: thresholdTo };
 
-        // turn the legend on
         chart.legend().enabled(true).fontSize(13).padding([0, 0, 20, 0]);
-        
+        chart.yGrid(true).xGrid(true).xMinorGrid(false).yMinorGrid(true);
+
         var controller = chart.annotations();
-        // Create vertical line annotation.
-        controller.verticalLine({
-            xAnchor: new Date().toISOString().split("T")[0],
-            stroke: '2 #000000 dashed'
-        }).allowEdit(false);
+        controller.verticalLine({ xAnchor: new Date().toISOString().split("T")[0], }).allowEdit(false).stroke({color: '#009688', thickness: 2, dash: '5 5', lineCap: 'round'});
 
         // add a scroller to the x-axis
         chart.xScroller(true);
