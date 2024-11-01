@@ -283,11 +283,13 @@ anychart.onDocumentReady(function () {
         .getElementById("threshold-from")
         .addEventListener("input", function () {
             updateJsonFromTable();
+            localStorage.setItem("dosingData", document.getElementById("dosing-json").value);
         });
 
     document
         .getElementById("threshold-to")
         .addEventListener("input", function () {
             updateJsonFromTable();
+            localStorage.setItem("dosingData", document.getElementById("dosing-json").value);
         });
 });
