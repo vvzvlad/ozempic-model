@@ -198,11 +198,11 @@ anychart.onDocumentReady(function () {
 
     // Load JSON and generate table on page load
     var savedJson = localStorage.getItem("dosingData");
-    var defaultJson = savedJson
+    var updatedJson = savedJson
         ? JSON.parse(savedJson)
         : { dosing_schedule: JSON.parse(document.getElementById("dosing-json").value), thresholds: { from: 14, to: 16 } };
-    updateTableFromJson(defaultJson.dosing_schedule);
-    createChart(defaultJson.dosing_schedule);
+    updateTableFromJson(updatedJson.dosing_schedule);
+    createChart(updatedJson.dosing_schedule);
 
     // Load JSON and generate table
     document
