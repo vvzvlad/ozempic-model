@@ -42,6 +42,7 @@ anychart.onDocumentReady(function () {
         var end_date = new Date(
         dosing_schedule_data[dosing_schedule_data.length - 1][0]
         );
+        end_date.setDate(end_date.getDate() + 7);  
         var all_dates = generateDateRange(start_date, end_date);
 
         // Create a map of dosing schedule for quick lookup
