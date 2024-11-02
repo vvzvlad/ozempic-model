@@ -67,7 +67,9 @@ function calculate_concentration_data(data) {
     }
 
     var start_date = new Date(dosing_schedule_data[0][0]);
-    var end_date = new Date(dosing_schedule_data[dosing_schedule_data.length - 1][0]);
+    var end_date = new Date(
+        dosing_schedule_data[dosing_schedule_data.length - 1][0]
+    );
     end_date.setDate(end_date.getDate() + 7);
     var all_dates = generate_date_range(start_date, end_date);
 
@@ -136,16 +138,16 @@ function render_chart(data) {
     chart.padding([10, 20, 5, 20]);
     chart.animation(false);
     chart.crosshair(true);
-    chart.x_axis().labels().rotation(-80);
-    chart.y_axis().title("Body ozempic concentration (nmol/L)");
+    chart.xAxis().labels().rotation(-80);
+    chart.yAxis().title("Body ozempic concentration (nmol/L)");
 
-    console.log(data);
+    //console.log(data);
 
     // setup first series (Body concentration)
     var series_body_concentration = chart.line(anychart.data.set(data.body_concentration).mapAs({ x: 0, value: 1 }));
     series_body_concentration.name("Body concentration");
     series_body_concentration.tooltip().enabled(true);
-    series_body_concentration.legend_item().icon_type("line");
+    series_body_concentration.legendItem().iconType("line");
 
     // setup second series (Dosing schedule)
     var adjusted_dosing_schedule_data = data.dosing_schedule
@@ -164,13 +166,13 @@ function render_chart(data) {
                 x: date,
                 value: value,
                 dose: dose,
-                normal: { marker_size: marker_size },
-                hovered: { marker_size: marker_size },
-                selected: { marker_size: marker_size }
+                normal: { markerSize: marker_size },
+                hovered: { markerSize: marker_size },
+                selected: { markerSize: marker_size }
             };
         });
 
-    console.log(adjusted_dosing_schedule_data);
+    //console.log(adjusted_dosing_schedule_data);
     var data_set = anychart.data.set(adjusted_dosing_schedule_data);
     var data_mapping = data_set.mapAs({ x: 'x', value: 'value' });
 
@@ -178,40 +180,40 @@ function render_chart(data) {
     series_dosing_schedule.name("Dose");
     series_dosing_schedule.tooltip().enabled(false);
 
-    series_dosing_schedule.labels().enabled(true).anchor("left-center").padding(10).font_size(9)
+    series_dosing_schedule.labels().enabled(true).anchor("left-center").padding(10).fontSize(9)
     series_dosing_schedule.normal().type("circle")
-    series_dosing_schedule.labels().format(function () { return this.get_data('dose').toString(); });
-    series_dosing_schedule.legend_item().icon_type("circle");
+    series_dosing_schedule.labels().format(function () { return this.getData('dose').toString(); });
+    series_dosing_schedule.legendItem().iconType("circle");
 
     // setup third series (14-day Moving Average)
     var series_moving_average = chart.line(anychart.data.set(data.moving_average).mapAs({ x: 0, value: 1 }));
     series_moving_average.name("14-day Moving Average");
     series_moving_average.stroke({ dash: "5 2", thickness: 2, color: "#FF5733" });
     series_moving_average.tooltip().enabled(false);
-    series_moving_average.legend_item().icon_type("spline");
+    series_moving_average.legendItem().iconType("spline");
 
     var threshold_from = parseFloat(document.getElementById("threshold-from").value);
     var threshold_to = parseFloat(document.getElementById("threshold-to").value);
-    chart.range_marker().from(threshold_from).to(threshold_to).fill("rgba(0, 255, 0, 0.3)");
+    chart.rangeMarker().from(threshold_from).to(threshold_to).fill("rgba(0, 255, 0, 0.3)");
 
-    chart.legend().enabled(true).font_size(13).padding([10, 10, 10, 10]).position("left").align("top").position_mode("inside");
+    chart.legend().enabled(true).fontSize(13).padding([10, 10, 10, 10]).position("left").align("top").positionMode("inside");
 
-    chart.y_scale().ticks().interval(3);
-    chart.y_scale().minor_ticks().interval(1);
+    chart.yScale().ticks().interval(3);
+    chart.yScale().minorTicks().interval(1);
 
     chart.left(20);
     chart.right(20);
     var date_time_scale = anychart.scales.dateTime();
     date_time_scale.ticks().interval('day', 1);
-    chart.x_scale(date_time_scale);
+    chart.xScale(date_time_scale);
 
-    chart.x_grid({ stroke: '#E8E8E8', dash: "3 5" }).x_minor_grid(false);
-    chart.y_grid({ stroke: '#E8E8E8', dash: "3 5" }).y_minor_grid(false);
+    chart.xGrid({ stroke: '#E8E8E8', dash: "3 5" }).xMinorGrid(false);
+    chart.yGrid({ stroke: '#E8E8E8', dash: "3 5" }).yMinorGrid(false);
 
     var controller = chart.annotations();
-    controller.vertical_line({ x_anchor: new Date().toISOString().split("T")[0] }).allow_edit(false).stroke({ color: '#009688', thickness: 2, dash: '5 5', line_cap: 'round' });
+    controller.verticalLine({ xAnchor: new Date().toISOString().split("T")[0] }).allowEdit(false).stroke({ color: '#009688', thickness: 2, dash: '5 5', lineCap: 'round' });
 
-    chart.x_scroller(true);
+    chart.xScroller(true);
     chart.container("chart-container");
     chart.draw();
 }
@@ -287,7 +289,7 @@ function get_data_from_html() {
 }
 
 function save_data_to_local_storage(data) {
-    localStorage.setItem("dosing_data", JSON.stringify(data));
+    localStorage.setItem("ozempic_data", JSON.stringify(data));
 }
 
 function save_data_to_json(data) {
@@ -314,7 +316,7 @@ function from_json_to_html() {
 }
 
 function load_data_from_local_storage() {
-    var local_storage_json = localStorage.getItem("dosing_data");
+    var local_storage_json = localStorage.getItem("ozempic_data");
     var data = local_storage_json ? JSON.parse(local_storage_json) : JSON.parse(default_json_data);
     return data;
 }
