@@ -51,7 +51,7 @@ function remove_row() {
 
 
 function render_chart(data) {
-    console.log(data);      
+    //console.log(data);      
     var tmax_percent = 0.95; // 95% absorption on tmax time
     var absorption_day_rate = 1 - Math.pow(1 - tmax_percent, 1 / data.pharmacokinetics.tmax);
     var elimination_day_rate = Math.pow(0.5, 1 / data.pharmacokinetics.elimination_halflife);
