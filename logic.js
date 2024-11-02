@@ -1,7 +1,10 @@
 var currentChart = null;
 var default_json_data = '{"dosing_schedule":[["2024-08-30","0.25"],["2024-09-01","0.25"],["2024-09-08","0.25"],["2024-09-15","0.25"],["2024-09-22","0.25"],["2024-09-25","0.25"],["2024-09-29","0.25"],["2024-10-05","0.5"],["2024-10-13","0.5"],["2024-10-20","0.25"],["2024-10-24","0.25"],["2024-10-26","0.25"],["2024-10-30","0.25"],["2024-11-02","0.25"],["2024-11-05","0.25"],["2024-11-09","0.25"],["2024-11-12","0.25"],["2024-11-15","0.25"],["2024-11-19","0.25"],["2024-11-22","0.25"],["2024-11-26","0.25"],["2024-11-29","0.25"]],"thresholds":{"from":13,"to":15}}'
 var doseOptions = [0, 0.25, 0.5, 1, 2];
-
+var halfLifePeriod = 7;
+var absorptionHalfLife = 2; // Half-life for absorption is 2 days (95% absorption in 2 days)
+var absorptionRate = 1 - Math.pow(0.05, 1 / absorptionHalfLife); // Calculate daily absorption rate based on half-life
+var mg_nmmol_ratio = 16 / 0.8; // Conversion ratio from mg to nmol/L
 
 function createChart(dosing_schedule_data) {
     // Dispose of the existing chart if it exists
@@ -19,11 +22,6 @@ function createChart(dosing_schedule_data) {
     chart.xAxis().labels().rotation(-80);
     chart.title("Modeling Ozempic Concentration");
     chart.yAxis().title("Concentration (nmol/L)");
-
-    var halfLifePeriod = 7;
-    var absorptionHalfLife = 2; // Half-life for absorption is 2 days (95% absorption in 2 days)
-    var absorptionRate = 1 - Math.pow(0.05, 1 / absorptionHalfLife); // Calculate daily absorption rate based on half-life
-    const MG_TO_NMOL_RATIO = 16 / 0.8; // Conversion ratio from mg to nmol/L
 
     function dailyDecayFactor(halfLifePeriod) {
         return Math.pow(0.5, 1 / halfLifePeriod);
@@ -76,7 +74,7 @@ function createChart(dosing_schedule_data) {
         }
 
         // Convert body concentration from mg to nmol/L
-        var body_concentration_nmol = body_concentration * MG_TO_NMOL_RATIO;
+        var body_concentration_nmol = body_concentration * mg_nmmol_ratio;
 
         // Add the calculated concentration to the data array
         body_concentration_data.push([ dateString, body_concentration_nmol.toFixed(2), ]);
