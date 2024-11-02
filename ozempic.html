@@ -22,7 +22,7 @@
       padding: 0;
     }
     table {
-      width: 70%;
+      width: 40%;
       margin: 10px auto;
       border-collapse: collapse;
       font-size: 12px;
@@ -39,6 +39,7 @@
       justify-content: center;
       align-items: center;
       margin-top: 10px;
+      margin-bottom: 10px;
     }
     #dosing-json {
       width: 40%;
@@ -62,9 +63,16 @@
     #thresholds-container {
       display: flex;
       justify-content: center;
-      margin: 20px 0;
+      margin: 10px 0;
     }
-
+    #threshold-to {
+      margin-right: 10px;
+      margin-left: 5px;
+    }
+    #threshold-from {
+      margin-right: 10px;
+      margin-left: 5px;
+    }
     #thresholds-container input[type="number"] {
       width: 50px;
     }
@@ -96,9 +104,9 @@
   
   <div id="thresholds-container">
     <label for="threshold-from">Threshold From:</label>
-    <input type="number" id="threshold-from" name="threshold-from" min="0" value="14">
+    <input type="number" id="threshold-from" name="threshold-from" min="0">
     <label for="threshold-to">Threshold To:</label>
-    <input type="number" id="threshold-to" name="threshold-to" min="0" value="16">
+    <input type="number" id="threshold-to" name="threshold-to" min="0">
   </div>
 
   <div id="dosing-json-container">
