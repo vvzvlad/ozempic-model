@@ -1,5 +1,6 @@
 var currentChart = null;
 var default_json_data = '{"dosing_schedule":[["2024-08-30","0.25"],["2024-09-01","0.25"],["2024-09-08","0.25"],["2024-09-15","0.25"],["2024-09-22","0.25"],["2024-09-25","0.25"],["2024-09-29","0.25"],["2024-10-05","0.5"],["2024-10-13","0.5"],["2024-10-20","0.25"],["2024-10-24","0.25"],["2024-10-26","0.25"],["2024-10-30","0.25"],["2024-11-02","0.25"],["2024-11-05","0.25"],["2024-11-09","0.25"],["2024-11-12","0.25"],["2024-11-15","0.25"],["2024-11-19","0.25"],["2024-11-22","0.25"],["2024-11-26","0.25"],["2024-11-29","0.25"]],"thresholds":{"from":13,"to":15}}'
+var doseOptions = [0, 0.25, 0.5, 1, 2];
 
 
 function createChart(dosing_schedule_data) {
@@ -175,7 +176,7 @@ function load_content_from_data(data) {
         var doseCell = document.createElement("td");
         var doseInputGroup = document.createElement("div");
         doseInputGroup.classList.add("dose-input-group");
-        [0, 0.25, 0.5, 1, 2].forEach(function (optionValue) {
+        doseOptions.forEach(function (optionValue) {
             var label = document.createElement("label");
             var radio = document.createElement("input");
             radio.type = "radio";
@@ -231,7 +232,7 @@ function add_row() {
     var doseCell = document.createElement("td");
     var doseInputGroup = document.createElement("div");
     doseInputGroup.classList.add("dose-input-group");
-    [0, 0.25, 0.5, 1, 2].forEach(function (optionValue) {
+    doseOptions.forEach(function (optionValue) {
         var label = document.createElement("label");
         var radio = document.createElement("input");
         radio.type = "radio";
