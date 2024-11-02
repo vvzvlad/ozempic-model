@@ -1,11 +1,7 @@
 var chart = null;
 var default_json_data = '{ "thresholds":{"from":13,"to":15}, "pharmacokinetics":{"tmax":2,"elimination_halflife":7},  "dosing_schedule":[["2024-08-30","0.25"],["2024-09-01","0.25"],["2024-09-08","0.25"],["2024-09-15","0.25"],["2024-09-22","0.25"],["2024-09-25","0.25"],["2024-09-29","0.25"],["2024-10-05","0.5"],["2024-10-13","0.5"],["2024-10-20","0.25"],["2024-10-24","0.25"],["2024-10-26","0.25"],["2024-10-30","0.25"],["2024-11-02","0.25"],["2024-11-05","0.25"],["2024-11-09","0.25"],["2024-11-12","0.25"],["2024-11-15","0.25"],["2024-11-19","0.25"],["2024-11-22","0.25"],["2024-11-26","0.25"],["2024-11-29","0.25"]] }'
 var doseOptions = [0, 0.25, 0.5, 1, 2];
-var elimination_halflife = 7;
-var tmax = 2; // absorption half-life
-var tmax_percent = 0.95; // 95% absorption on tmax time
-var absorption_day_rate = 1 - Math.pow(1-tmax_percent, 1 / tmax); 
-var elimination_day_rate = Math.pow(0.5, 1 / elimination_halflife);
+
 var mg_nmmol_ratio = 16 / 0.8; // Conversion ratio from mg to nmol/L
 
 function add_row() {
@@ -54,7 +50,14 @@ function remove_row() {
 }
 
 
-function createChart(dosing_schedule_data) {
+function render_chart(data) {
+    console.log(data);      
+    var tmax_percent = 0.95; // 95% absorption on tmax time
+    var absorption_day_rate = 1 - Math.pow(1 - tmax_percent, 1 / data.pharmacokinetics.tmax);
+    var elimination_day_rate = Math.pow(0.5, 1 / data.pharmacokinetics.elimination_halflife);
+
+    var dosing_schedule_data = data.dosing_schedule;
+
     // Dispose of the existing chart if it exists
     if (chart) {
         chart.dispose();
@@ -246,12 +249,17 @@ function save_data_to_html(data) {
 
         tbody.appendChild(row);
     });
-    document.getElementById("threshold-from").value = data.thresholds.from;
-    document.getElementById("threshold-to").value = data.thresholds.to;
-    createChart(dosing_schedule);
+    if (data.thresholds) {
+        document.getElementById("threshold-from").value = data.thresholds.from || 13;
+        document.getElementById("threshold-to").value = data.thresholds.to || 15;
+    }
+    if (data.pharmacokinetics) {
+    document.getElementById("tmax").value = data.pharmacokinetics.tmax || 2;
+    document.getElementById("elimination_halflife").value = data.pharmacokinetics.elimination_halflife || 7;
+    }
 }
 
-function get_data() {
+function get_data_from_html() {
     var dosingData = [];
     var rows = document.querySelectorAll("#dosing-schedule-table tbody tr");
     rows.forEach(function (row, index) {
@@ -261,7 +269,19 @@ function get_data() {
     });
     var thresholdFrom = parseFloat(document.getElementById("threshold-from").value);
     var thresholdTo = parseFloat(document.getElementById("threshold-to").value);
-    var json_data = { dosing_schedule: dosingData, thresholds: { from: thresholdFrom, to: thresholdTo } };
+    var tmax = parseFloat(document.getElementById("tmax").value);
+    var elimination_halflife = parseFloat(document.getElementById("elimination_halflife").value);
+    var json_data = {
+        dosing_schedule: dosingData,
+        thresholds: { 
+            from: thresholdFrom, 
+            to: thresholdTo 
+        },
+        pharmacokinetics: {
+            tmax: tmax,
+            elimination_halflife: elimination_halflife,
+        },
+    };
     return json_data;
 }
 
@@ -274,16 +294,10 @@ function save_data_to_json(data) {
 }
 
 function save_data_render_chart() {
-    var data = get_data()
+    var data = get_data_from_html()
     save_data_to_local_storage(data);
     save_data_to_json(data);
-    createChart(data.dosing_schedule);
-}
-
-function load_data_from_html() {
-    var html_json = document.getElementById("dosing-json").value;
-    var data = JSON.parse(html_json);
-    save_data_to_html(data);
+    render_chart(data);
 }
 
 function from_json_to_html() {
@@ -291,6 +305,7 @@ function from_json_to_html() {
     try {
         var data = JSON.parse(html_json);
         save_data_to_html(data);
+        save_data_render_chart()
     } catch (e) {        
         alert("Invalid JSON format");
     }
@@ -303,11 +318,12 @@ function load_data_from_local_storage() {
 }
 
 
+
 anychart.onDocumentReady(function () {
     data = load_data_from_local_storage()
     save_data_to_html(data);
     save_data_to_json(data);
-    createChart(data.dosing_schedule);
+    render_chart(data);
 
     document.getElementById("load-json-button").addEventListener("click", from_json_to_html);
     document.getElementById("add-row-button").addEventListener("click", add_row);
@@ -316,6 +332,8 @@ anychart.onDocumentReady(function () {
     document.querySelector("#dosing-schedule-table").addEventListener("input", save_data_render_chart);
     document.getElementById("threshold-from").addEventListener("input", save_data_render_chart);
     document.getElementById("threshold-to").addEventListener("input", save_data_render_chart);
+    document.getElementById("tmax").addEventListener("input", save_data_render_chart);
+    document.getElementById("elimination_halflife").addEventListener("input", save_data_render_chart);
 });
 
 

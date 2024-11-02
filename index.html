@@ -66,20 +66,21 @@
       justify-content: center;
       margin-top: 10px;
     }
-    #thresholds-container {
+    #thresholds-container, 
+    #pk-container {
       display: flex;
       justify-content: center;
       margin: 10px 0;
     }
-    #threshold-to {
+    #threshold-from, 
+    #threshold-to, 
+    #tmax, 
+    #elimination_halflife {
       margin-right: 10px;
       margin-left: 5px;
     }
-    #threshold-from {
-      margin-right: 10px;
-      margin-left: 5px;
-    }
-    #thresholds-container input[type="number"] {
+    #thresholds-container input[type="number"], 
+    #pk-container input[type="number"] {
       width: 50px;
     }
     #add-row-button, #remove-row-button {
@@ -115,6 +116,15 @@
     <label for="threshold-to">Threshold To:</label>
     <input type="number" id="threshold-to" name="threshold-to" min="0">
   </div>
+
+  <div id="pk-container">
+    <label for="tmax">Tmax (95% absoption):</label>
+    <input type="number" id="tmax" name="tmax" min="0" max="10">
+    <label for="elimination_halflife">Elimination Halflife:</label>
+    <input type="number" id="elimination_halflife" name="elimination_halflife" min="1" max="20">
+
+  </div>
+
 
   <div id="dosing-json-container">
     <textarea id="dosing-json"></textarea>
