@@ -151,7 +151,7 @@ function createChart(dosing_schedule_data) {
     controller.verticalLine({ xAnchor: new Date().toISOString().split("T")[0], }).allowEdit(false).stroke({color: '#009688', thickness: 2, dash: '5 5', lineCap: 'round'});
 
     chart.xScroller(true);
-    chart.container("container");
+    chart.container("chart-container");
     chart.draw();
 }
 

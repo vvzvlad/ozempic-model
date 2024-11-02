@@ -15,7 +15,7 @@
       margin: 0;
       padding: 0 20px;
     }
-    #container {
+    #chart-container {
       width: 70%;
       height: 500px;
       margin: 20px auto;
@@ -25,6 +25,7 @@
       background: white;
       z-index: 10;
     }
+
     table {
       width: 40%;
       margin: 10px auto;
@@ -88,7 +89,8 @@
   </head>
   <body>
 
-  <div id="container"></div>
+  <div id="chart-container"></div>
+
   <table id="dosing-schedule-table">
     <thead>
       <tr>
@@ -117,7 +119,7 @@
     <textarea id="dosing-json"></textarea>
     <button id="load-json-button">Load from JSON</button>
   </div>
-  
+
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
