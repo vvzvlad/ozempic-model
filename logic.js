@@ -1,10 +1,58 @@
 var chart = null;
-var default_json_data = '{"dosing_schedule":[["2024-08-30","0.25"],["2024-09-01","0.25"],["2024-09-08","0.25"],["2024-09-15","0.25"],["2024-09-22","0.25"],["2024-09-25","0.25"],["2024-09-29","0.25"],["2024-10-05","0.5"],["2024-10-13","0.5"],["2024-10-20","0.25"],["2024-10-24","0.25"],["2024-10-26","0.25"],["2024-10-30","0.25"],["2024-11-02","0.25"],["2024-11-05","0.25"],["2024-11-09","0.25"],["2024-11-12","0.25"],["2024-11-15","0.25"],["2024-11-19","0.25"],["2024-11-22","0.25"],["2024-11-26","0.25"],["2024-11-29","0.25"]],"thresholds":{"from":13,"to":15}}'
+var default_json_data = '{ "thresholds":{"from":13,"to":15}, "pharmacokinetics":{"tmax":2,"elimination_halflife":7},  "dosing_schedule":[["2024-08-30","0.25"],["2024-09-01","0.25"],["2024-09-08","0.25"],["2024-09-15","0.25"],["2024-09-22","0.25"],["2024-09-25","0.25"],["2024-09-29","0.25"],["2024-10-05","0.5"],["2024-10-13","0.5"],["2024-10-20","0.25"],["2024-10-24","0.25"],["2024-10-26","0.25"],["2024-10-30","0.25"],["2024-11-02","0.25"],["2024-11-05","0.25"],["2024-11-09","0.25"],["2024-11-12","0.25"],["2024-11-15","0.25"],["2024-11-19","0.25"],["2024-11-22","0.25"],["2024-11-26","0.25"],["2024-11-29","0.25"]] }'
 var doseOptions = [0, 0.25, 0.5, 1, 2];
-var halfLifePeriod = 7;
-var absorptionHalfLife = 2; // Half-life for absorption is 2 days (95% absorption in 2 days)
-var absorptionRate = 1 - Math.pow(0.05, 1 / absorptionHalfLife); // Calculate daily absorption rate based on half-life
+var elimination_halflife = 7;
+var tmax = 2; // absorption half-life
+var tmax_percent = 0.95; // 95% absorption on tmax time
+var absorption_day_rate = 1 - Math.pow(1-tmax_percent, 1 / tmax); 
+var elimination_day_rate = Math.pow(0.5, 1 / elimination_halflife);
 var mg_nmmol_ratio = 16 / 0.8; // Conversion ratio from mg to nmol/L
+
+function add_row() {
+    var tbody = document.querySelector("#dosing-schedule-table tbody");
+    var newRow = document.createElement("tr");
+
+    var dateCell = document.createElement("td");
+    var dateInput = document.createElement("input");
+    dateInput.type = "date";
+    dateInput.classList.add("date-input");
+    var lastRowDateInput = tbody.lastChild.querySelector(".date-input");
+    var newDate = new Date(lastRowDateInput.value);
+    newDate.setDate(newDate.getDate() + 1);
+    dateInput.value = newDate.toISOString().split("T")[0];
+    dateCell.appendChild(dateInput);
+    newRow.appendChild(dateCell);
+
+    var doseCell = document.createElement("td");
+    var doseInputGroup = document.createElement("div");
+    doseInputGroup.classList.add("dose-input-group");
+    doseOptions.forEach(function (optionValue) {
+        var label = document.createElement("label");
+        var radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = `dose-${tbody.children.length}`;
+        radio.value = optionValue;
+        if (optionValue === 0) { radio.checked = true; }
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(` ${optionValue}`));
+        doseInputGroup.appendChild(label);
+    });
+    doseCell.appendChild(doseInputGroup);
+    newRow.appendChild(doseCell);
+
+    tbody.appendChild(newRow);
+    save_data_render_chart();
+}
+
+
+function remove_row() {
+    var tbody = document.querySelector("#dosing-schedule-table tbody");
+    if (tbody.children.length > 0) {
+        tbody.removeChild(tbody.lastChild);
+        save_data_render_chart();
+    }
+}
+
 
 function createChart(dosing_schedule_data) {
     // Dispose of the existing chart if it exists
@@ -20,10 +68,6 @@ function createChart(dosing_schedule_data) {
     //chart.title("Modeling Ozempic Concentration");
     chart.xAxis().labels().rotation(-80);
     chart.yAxis().title("Body ozempic concentration (nmol/L)");
-
-    function dailyDecayFactor(halfLifePeriod) {
-        return Math.pow(0.5, 1 / halfLifePeriod);
-    }
 
     // Generate an array of dates from the start to the end of the dosing schedule
     function generateDateRange(startDate, endDate) {
@@ -55,20 +99,18 @@ function createChart(dosing_schedule_data) {
 
     all_dates.forEach(function (date) {
         var dateString = date.toISOString().split("T")[0];
-        var doseAdded = 0;
 
         // Calculate absorption from depot (based on calculated absorption rate)
-        var absorbedFromDepot = depot * absorptionRate;
+        var absorbedFromDepot = depot * absorption_day_rate;
         depot -= absorbedFromDepot;
         body_concentration += absorbedFromDepot;
 
         // Calculate decay (excretion) from body concentration
-        body_concentration = body_concentration * dailyDecayFactor(halfLifePeriod);
+        body_concentration = body_concentration * elimination_day_rate;
 
         // Add dose to depot if present for that day
         if (dosing_map[dateString]) {
-            doseAdded = dosing_map[dateString];
-            depot += doseAdded;
+            depot += dosing_map[dateString];
         }
 
         // Convert body concentration from mg to nmol/L
@@ -170,7 +212,7 @@ function createChart(dosing_schedule_data) {
 }
 
 
-function load_content_from_data(data) {
+function save_data_to_html(data) {
     var tbody = document.querySelector("#dosing-schedule-table tbody");
     tbody.innerHTML = "";
     dosing_schedule = data.dosing_schedule
@@ -209,7 +251,7 @@ function load_content_from_data(data) {
     createChart(dosing_schedule);
 }
 
-function save_content_render_chart() {
+function get_data() {
     var dosingData = [];
     var rows = document.querySelectorAll("#dosing-schedule-table tbody tr");
     rows.forEach(function (row, index) {
@@ -219,80 +261,61 @@ function save_content_render_chart() {
     });
     var thresholdFrom = parseFloat(document.getElementById("threshold-from").value);
     var thresholdTo = parseFloat(document.getElementById("threshold-to").value);
-    var updatedJson = { dosing_schedule: dosingData, thresholds: { from: thresholdFrom, to: thresholdTo } };
-    document.getElementById("dosing-json").value = JSON.stringify(updatedJson);
-    localStorage.setItem("dosingData", JSON.stringify(updatedJson));
-    createChart(dosingData);
+    var json_data = { dosing_schedule: dosingData, thresholds: { from: thresholdFrom, to: thresholdTo } };
+    return json_data;
 }
 
-
-function add_row() {
-    var tbody = document.querySelector("#dosing-schedule-table tbody");
-    var newRow = document.createElement("tr");
-
-    var dateCell = document.createElement("td");
-    var dateInput = document.createElement("input");
-    dateInput.type = "date";
-    dateInput.classList.add("date-input");
-    var lastRowDateInput = tbody.lastChild.querySelector(".date-input");
-    var newDate = new Date(lastRowDateInput.value);
-    newDate.setDate(newDate.getDate() + 1);
-    dateInput.value = newDate.toISOString().split("T")[0];
-    dateCell.appendChild(dateInput);
-    newRow.appendChild(dateCell);
-
-    var doseCell = document.createElement("td");
-    var doseInputGroup = document.createElement("div");
-    doseInputGroup.classList.add("dose-input-group");
-    doseOptions.forEach(function (optionValue) {
-        var label = document.createElement("label");
-        var radio = document.createElement("input");
-        radio.type = "radio";
-        radio.name = `dose-${tbody.children.length}`;
-        radio.value = optionValue;
-        if (optionValue === 0) { radio.checked = true; }
-        label.appendChild(radio);
-        label.appendChild(document.createTextNode(` ${optionValue}`));
-        doseInputGroup.appendChild(label);
-    });
-    doseCell.appendChild(doseInputGroup);
-    newRow.appendChild(doseCell);
-
-    tbody.appendChild(newRow);
-    save_content_render_chart();
+function save_data_to_local_storage(data) {
+    localStorage.setItem("dosingData", JSON.stringify(data));
 }
 
-function remove_row() {
-    var tbody = document.querySelector("#dosing-schedule-table tbody");
-    if (tbody.children.length > 0) {
-        tbody.removeChild(tbody.lastChild);
-        save_content_render_chart();
-    }
+function save_data_to_json(data) {
+    document.getElementById("dosing-json").value = JSON.stringify(data);
 }
 
-function load_json() {
-    var json = document.getElementById("dosing-json").value;
+function save_data_render_chart() {
+    var data = get_data()
+    save_data_to_local_storage(data);
+    save_data_to_json(data);
+    createChart(data.dosing_schedule);
+}
+
+function load_data_from_html() {
+    var html_json = document.getElementById("dosing-json").value;
+    var data = JSON.parse(html_json);
+    save_data_to_html(data);
+}
+
+function from_json_to_html() {
+    var html_json = document.getElementById("dosing-json").value;
     try {
-        var data = JSON.parse(json);
-        load_content_from_data(data);
+        var data = JSON.parse(html_json);
+        save_data_to_html(data);
     } catch (e) {        
         alert("Invalid JSON format");
     }
 }
 
-anychart.onDocumentReady(function () {
+function load_data_from_local_storage() {
     var local_storage_json = localStorage.getItem("dosingData");
-    var data = local_storage_json ? JSON.parse(local_storage_json) : JSON.parse(default_json_data);    
-    load_content_from_data(data);
-    document.getElementById("dosing-json").value = JSON.stringify(data);
+    var data = local_storage_json ? JSON.parse(local_storage_json) : JSON.parse(default_json_data);
+    return data;
+}
 
-    document.getElementById("load-json-button").addEventListener("click", load_json);
+
+anychart.onDocumentReady(function () {
+    data = load_data_from_local_storage()
+    save_data_to_html(data);
+    save_data_to_json(data);
+    createChart(data.dosing_schedule);
+
+    document.getElementById("load-json-button").addEventListener("click", from_json_to_html);
     document.getElementById("add-row-button").addEventListener("click", add_row);
     document.getElementById("remove-row-button").addEventListener("click", remove_row);
 
-    document.querySelector("#dosing-schedule-table").addEventListener("input", save_content_render_chart);
-    document.getElementById("threshold-from").addEventListener("input", save_content_render_chart);
-    document.getElementById("threshold-to").addEventListener("input", save_content_render_chart);
+    document.querySelector("#dosing-schedule-table").addEventListener("input", save_data_render_chart);
+    document.getElementById("threshold-from").addEventListener("input", save_data_render_chart);
+    document.getElementById("threshold-to").addEventListener("input", save_data_render_chart);
 });
 
 
