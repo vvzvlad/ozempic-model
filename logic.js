@@ -73,12 +73,6 @@ function calculate_concentration_data(data) {
     end_date.setDate(end_date.getDate() + 7);
     var all_dates = generateDateRange(start_date, end_date);
 
-    // Create a map of dosing schedule for quick lookup
-    var dosing_map = {};
-    dosing_schedule_data.forEach(function (entry) {
-        dosing_map[entry[0]] = parseFloat(entry[1]);
-    });
-
     var body_concentration = 0;
     var depot = 0;
     var body_concentration_data = [];
@@ -95,8 +89,12 @@ function calculate_concentration_data(data) {
         body_concentration = body_concentration * elimination_day_rate;
 
         // Add dose to depot if present for that day
-        if (dosing_map[dateString]) {
-            depot += dosing_map[dateString];
+        var doseForDate = dosing_schedule_data.find(function (entry) {
+            return entry[0] === dateString;
+        });
+
+        if (doseForDate) {
+            depot += parseFloat(doseForDate[1]);
         }
 
         // Convert body concentration from mg to nmol/L
@@ -125,8 +123,7 @@ function calculate_concentration_data(data) {
     return {
         body_concentration: body_concentration_data,
         moving_average: moving_average_data,
-        dosing_schedule: dosing_schedule_data,
-        dosing_map: dosing_map,
+        dosing_schedule: dosing_schedule_data
     };
 }
 
@@ -141,11 +138,9 @@ function render_chart(data) {
     chart.padding([10, 20, 5, 20]);
     chart.animation(false);
     chart.crosshair(true);
-    //chart.title("Modeling Ozempic Concentration");
     chart.xAxis().labels().rotation(-80);
     chart.yAxis().title("Body ozempic concentration (nmol/L)");
 
-    var dosing_map = data.dosing_map;
     console.log(data);
 
     // setup first series (Body concentration)
@@ -158,7 +153,7 @@ function render_chart(data) {
     var adjusted_dosing_schedule_data = data.dosing_schedule
         .map(function (entry) {
             var date = entry[0];
-            var dose = parseFloat(dosing_map[date]);
+            var dose = parseFloat(entry[1]);
             var correspondingBodyConcentration = data.body_concentration.find(
                 function (concentrationEntry) { return concentrationEntry[0] === date; }
             );
