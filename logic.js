@@ -223,7 +223,10 @@ function add_row() {
     var dateInput = document.createElement("input");
     dateInput.type = "date";
     dateInput.classList.add("date-input");
-    dateInput.value = new Date().toISOString().split("T")[0];
+    var lastRowDateInput = tbody.lastChild.querySelector(".date-input");
+    var newDate = new Date(lastRowDateInput.value);
+    newDate.setDate(newDate.getDate() + 1);
+    dateInput.value = newDate.toISOString().split("T")[0];
     dateCell.appendChild(dateInput);
     newRow.appendChild(dateCell);
 
