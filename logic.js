@@ -1,4 +1,4 @@
-var currentChart = null;
+var chart = null;
 var default_json_data = '{"dosing_schedule":[["2024-08-30","0.25"],["2024-09-01","0.25"],["2024-09-08","0.25"],["2024-09-15","0.25"],["2024-09-22","0.25"],["2024-09-25","0.25"],["2024-09-29","0.25"],["2024-10-05","0.5"],["2024-10-13","0.5"],["2024-10-20","0.25"],["2024-10-24","0.25"],["2024-10-26","0.25"],["2024-10-30","0.25"],["2024-11-02","0.25"],["2024-11-05","0.25"],["2024-11-09","0.25"],["2024-11-12","0.25"],["2024-11-15","0.25"],["2024-11-19","0.25"],["2024-11-22","0.25"],["2024-11-26","0.25"],["2024-11-29","0.25"]],"thresholds":{"from":13,"to":15}}'
 var doseOptions = [0, 0.25, 0.5, 1, 2];
 var halfLifePeriod = 7;
@@ -8,20 +8,18 @@ var mg_nmmol_ratio = 16 / 0.8; // Conversion ratio from mg to nmol/L
 
 function createChart(dosing_schedule_data) {
     // Dispose of the existing chart if it exists
-    if (currentChart) {
-        currentChart.dispose();
-        currentChart = null;
-    }
-
-    var chart = anychart.line();
-    currentChart = chart; // Keep a reference to the current chart
+    if (chart) {
+        chart.dispose();
+        chart = null;
+    } 
+    chart = anychart.line();
 
     chart.padding([10, 20, 5, 20]);
     chart.animation(false);
     chart.crosshair(true);
+    //chart.title("Modeling Ozempic Concentration");
     chart.xAxis().labels().rotation(-80);
-    chart.title("Modeling Ozempic Concentration");
-    chart.yAxis().title("Concentration (nmol/L)");
+    chart.yAxis().title("Body ozempic concentration (nmol/L)");
 
     function dailyDecayFactor(halfLifePeriod) {
         return Math.pow(0.5, 1 / halfLifePeriod);
@@ -98,43 +96,59 @@ function createChart(dosing_schedule_data) {
 
     // setup first series (Body concentration)
     var seriesBodyConcentration = chart.line( anychart.data.set(body_concentration_data).mapAs({ x: 0, value: 1 }) );
-    seriesBodyConcentration.name("Body concentration (nmol/L)");
+    seriesBodyConcentration.name("Body concentration");
     seriesBodyConcentration.tooltip().enabled(true);
+    seriesBodyConcentration.legendItem().iconType("line");
 
     // setup second series (Dosing schedule)
-    var adjusted_dosing_schedule_data = dosing_schedule_data.map(function (
-        entry
-    ) {
-        var correspondingBodyConcentration = body_concentration_data.find(
-            function (concentrationEntry) {
-                return concentrationEntry[0] === entry[0];
-            }
-        );
-        return [
-            entry[0],
-            correspondingBodyConcentration ? correspondingBodyConcentration[1] : entry[1],
-        ];
-    });
+    var adjusted_dosing_schedule_data = dosing_schedule_data
+        .map(function (entry) {
+            var date = entry[0];
+            var dose = parseFloat(dosing_map[date]); 
+            var correspondingBodyConcentration = body_concentration_data.find(
+                function (concentrationEntry) { return concentrationEntry[0] === date; }
+            );
+            var value = correspondingBodyConcentration ? correspondingBodyConcentration[1] : entry[1];
+            
+            var doseSizeMap = { 0: 1, 0.25: 3, 0.5: 5, 1: 8, 2: 12 };
+            var markerSize = doseSizeMap[parseFloat(dose)] || 5;
 
-    var seriesDosingSchedule = chart.marker( anychart.data.set(adjusted_dosing_schedule_data).mapAs({ x: 0, value: 1 }) );
-    seriesDosingSchedule.name("Dosing schedule");
-    seriesDosingSchedule.tooltip().enabled(false);
-    seriesDosingSchedule.labels().enabled(true).anchor("left-center").padding(10).fontSize(9).rotation(30).format(function () {
-            return dosing_map[this.x];
+            return {
+                x: date,
+                value: value,
+                dose: dose,
+                normal: { markerSize: markerSize },
+                hovered: { markerSize: markerSize },
+                selected: { markerSize: markerSize }
+            };
         });
+
+    var dataSet = anychart.data.set(adjusted_dosing_schedule_data);
+    var dataMapping = dataSet.mapAs({ x: 'x', value: 'value' });
+
+    var seriesDosingSchedule = chart.marker(dataMapping);
+    seriesDosingSchedule.name("Dose");
+    seriesDosingSchedule.tooltip().enabled(false);
+
+    seriesDosingSchedule.labels().enabled(true).anchor("left-center").padding(10).fontSize(9)
+    seriesDosingSchedule.normal().type("circle")
+    seriesDosingSchedule.labels().format(function () { return this.getData('dose').toString(); });
+    seriesDosingSchedule.legendItem().iconType("circle");
+
 
     // setup third series (14-day Moving Average)
     var seriesMovingAverage = chart.line( anychart.data.set(moving_average_data).mapAs({ x: 0, value: 1 }) );
     seriesMovingAverage.name("14-day Moving Average");
     seriesMovingAverage.stroke({ dash: "5 2", thickness: 2, color: "#FF5733", });
     seriesMovingAverage.tooltip().enabled(false);
+    seriesMovingAverage.legendItem().iconType("spline");
 
     var thresholdFrom = parseFloat(document.getElementById("threshold-from").value);
     var thresholdTo = parseFloat(document.getElementById("threshold-to").value);
     chart.rangeMarker().from(thresholdFrom).to(thresholdTo).fill("rgba(0, 255, 0, 0.3)");
-    //updatedJson.thresholds = { from: thresholdFrom, to: thresholdTo };
 
-    chart.legend().enabled(true).fontSize(13).padding([0, 0, 20, 0]);
+    chart.legend().enabled(true).fontSize(13).padding([10, 10, 10, 10]).position("left").align("top").positionMode("inside");
+
     chart.yScale().ticks().interval(3);
     chart.yScale().minorTicks().interval(1);
 
