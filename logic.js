@@ -181,9 +181,7 @@ function load_content_from_data(data) {
             radio.type = "radio";
             radio.name = `dose-${index}`;
             radio.value = optionValue;
-            if (optionValue == entry[1]) {
-                radio.checked = true;
-            }
+            if (optionValue == entry[1]) { radio.checked = true; }
             label.appendChild(radio);
             label.appendChild(document.createTextNode(` ${optionValue}`));
             doseInputGroup.appendChild(label);
@@ -239,9 +237,7 @@ function add_row() {
         radio.type = "radio";
         radio.name = `dose-${tbody.children.length}`;
         radio.value = optionValue;
-        if (optionValue === 0.25) {
-            radio.checked = true;
-        }
+        if (optionValue === 0) { radio.checked = true; }
         label.appendChild(radio);
         label.appendChild(document.createTextNode(` ${optionValue}`));
         doseInputGroup.appendChild(label);
