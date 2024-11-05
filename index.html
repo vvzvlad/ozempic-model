@@ -90,13 +90,22 @@
       margin: 0 10px;
       padding: 5px 10px;
     }
+
+    #tables-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #dosing-schedule-table, #satiety-table {
+      width: 45%;
+    }
   </style>
   </head>
   <body>
 
   <div id="chart-container"></div>
 
-  <div style="display: flex; justify-content: space-around;">
+  <div id="tables-container">
     <table id="dosing-schedule-table">
       <thead>
         <tr>
