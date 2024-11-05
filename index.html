@@ -51,7 +51,7 @@
     }
 
     #dosing-schedule-table, #satiety-table {
-      width: 30%;
+      width: auto;
       margin-right: 10px;
       margin-left: 10px;
     }
@@ -98,7 +98,7 @@
     #pk-container input[type="number"] {
       width: 50px;
     }
-    #add-row-button, #remove-row-button {
+    #add-row-button-dosing, #remove-row-button-dosing, #add-row-button-satiety, #remove-row-button-satiety {
       margin: 0 10px;
       padding: 5px 10px;
     }
@@ -110,36 +110,45 @@
   <div id="chart-container"></div>
 
   <div id="tables-container">
-    <table id="dosing-schedule-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Dose (mg)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Rows will be generated here -->
-      </tbody>
-    </table>
-
-    <table id="satiety-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Satiety rate</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Rows will be generated here -->
-      </tbody>
-    </table>
+    <div id="dosing-schedule-table-container">
+      <table id="dosing-schedule-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Dose (mg)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be generated here -->
+        </tbody>
+      </table>
+      <div id="buttons-container">
+        <button id="add-row-button-dosing">Add Row</button>
+        <button id="remove-row-button-dosing">Remove Last Row</button>
+      </div>
+    </div>
+    
+    <div id="satiety-table-container">
+      <table id="satiety-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Satiety rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be generated here -->
+        </tbody>
+      </table>
+      <div id="buttons-container">
+        <button id="add-row-button-satiety">Add Row</button>
+        <button id="remove-row-button-satiety">Remove Last Row</button>
+      </div>
+    </div>
   </div>
 
 
-  <div id="buttons-container">
-    <button id="add-row-button">Add Row</button>
-    <button id="remove-row-button">Remove Last Row</button>
-  </div>
+
   
   <div id="thresholds-container">
     <label for="threshold-from">Threshold From:</label>
@@ -153,7 +162,6 @@
     <input type="number" id="tmax" name="tmax" min="0" max="10">
     <label for="elimination_halflife">Elimination Halflife:</label>
     <input type="number" id="elimination_halflife" name="elimination_halflife" min="1" max="20">
-
   </div>
 
 

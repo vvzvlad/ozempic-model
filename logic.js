@@ -68,6 +68,8 @@ function add_row_satiety() {
     satiety_input.type = "number";
     satiety_input.step = 0.5;
     satiety_input.value = 5;
+    satiety_input.max = 9;
+    satiety_input.min = 0;
     satiety_cell.appendChild(satiety_input);
     new_row.appendChild(satiety_cell);
 
@@ -82,29 +84,28 @@ function remove_row_satiety() {
 }
 
 
+// Generate an array of dates from the start to the end of the dosing schedule
+function generate_date_range(start_date, end_date) {
+    var dates = [];
+    var current_date = new Date(start_date);
+    while (current_date <= end_date) {
+        dates.push(new Date(current_date));
+        current_date.setDate(current_date.getDate() + 1);
+    }
+    return dates;
+}
+
 
 function calculate_concentration_data(data) {
     var tmax_percent = 0.95; // 95% absorption on tmax time
     var absorption_day_rate = 1 - Math.pow(1 - tmax_percent, 1 / data.pharmacokinetics.tmax);
     var elimination_day_rate = Math.pow(0.5, 1 / data.pharmacokinetics.elimination_halflife);
 
+    var satiety_data = data.satiety;
     var dosing_schedule_data = data.dosing_schedule;
 
-    // Generate an array of dates from the start to the end of the dosing schedule
-    function generate_date_range(start_date, end_date) {
-        var dates = [];
-        var current_date = new Date(start_date);
-        while (current_date <= end_date) {
-            dates.push(new Date(current_date));
-            current_date.setDate(current_date.getDate() + 1);
-        }
-        return dates;
-    }
-
     var start_date = new Date(dosing_schedule_data[0][0]);
-    var end_date = new Date(
-        dosing_schedule_data[dosing_schedule_data.length - 1][0]
-    );
+    var end_date = new Date( dosing_schedule_data[dosing_schedule_data.length - 1][0] );
     end_date.setDate(end_date.getDate() + 7);
     var all_dates = generate_date_range(start_date, end_date);
 
@@ -158,7 +159,8 @@ function calculate_concentration_data(data) {
     return {
         body_concentration: body_concentration_data,
         moving_average: moving_average_data,
-        dosing_schedule: dosing_schedule_data
+        dosing_schedule: dosing_schedule_data,
+        satiety: satiety_data
     };
 }
 
@@ -184,11 +186,13 @@ function render_chart(data) {
     series_body_concentration.tooltip().enabled(true);
     series_body_concentration.legendItem().iconType("line");
 
-    var series_socieity = chart.line(anychart.data.set(data.satiety).mapAs({ x: 0, value: 1 }));
+    var series_socieity = chart.spline(anychart.data.set(data.satiety).mapAs({ x: 0, value: 1 }));
     series_socieity.name("Satiety");
     series_socieity.stroke({ color: "#FF5733" });
     series_socieity.tooltip().enabled(true);
     series_socieity.legendItem().iconType("line");
+    series_socieity.connectMissingPoints(true);
+
     
 
     // setup series Dosing schedule
@@ -228,7 +232,7 @@ function render_chart(data) {
     series_dosing_schedule.legendItem().iconType("circle");
 
     // setup series 14-day Moving Average
-    var series_moving_average = chart.line(anychart.data.set(data.moving_average).mapAs({ x: 0, value: 1 }));
+    var series_moving_average = chart.spline(anychart.data.set(data.moving_average).mapAs({ x: 0, value: 1 }));
     series_moving_average.name("14-day Moving Average");
     series_moving_average.stroke({ dash: "5 2", thickness: 2, color: "#FF5733" });
     series_moving_average.tooltip().enabled(false);
@@ -313,6 +317,8 @@ function save_data_to_html(data) {
         var satiety_input = document.createElement("input");
         satiety_input.type = "number";
         satiety_input.step = 0.5;
+        satiety_input.max = 9;
+        satiety_input.min = 0;
         satiety_input.value = entry[1];
         satiety_cell.appendChild(satiety_input);
         row.appendChild(satiety_cell);
@@ -379,11 +385,14 @@ function save_data_to_json(data) {
 
 function save_data_render_chart() {
     var data = get_data_from_html();
-    var chart_data = calculate_concentration_data(data);
     save_data_to_local_storage(data);
     save_data_to_json(data);
+    console.log(data);
+
+    var chart_data = calculate_concentration_data(data);
     render_chart(chart_data);
 }
+
 
 function from_json_to_html() {
     var html_json = document.getElementById("dosing-json").value;
